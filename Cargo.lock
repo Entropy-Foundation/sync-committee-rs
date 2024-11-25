@@ -3253,7 +3253,7 @@ dependencies = [
 [[package]]
 name = "ssz-rs"
 version = "0.8.0"
-source = "git+https://github.com/polytope-labs/ssz-rs?branch=main#6f5d37b7f92875b5cbb6ef60e8c498ca013943cb"
+source = "git+https://github.com/Entropy-Foundation/ssz-rs?branch=eth_hypernova#6e6d8b23b1e02cafb756c41733605bf361f45ce2"
 dependencies = [
  "as-any",
  "bitvec",
@@ -3269,7 +3269,7 @@ dependencies = [
 [[package]]
 name = "ssz-rs-derive"
 version = "0.8.0"
-source = "git+https://github.com/polytope-labs/ssz-rs?branch=main#6f5d37b7f92875b5cbb6ef60e8c498ca013943cb"
+source = "git+https://github.com/Entropy-Foundation/ssz-rs?branch=eth_hypernova#6e6d8b23b1e02cafb756c41733605bf361f45ce2"
 dependencies = [
  "proc-macro2",
  "quote",

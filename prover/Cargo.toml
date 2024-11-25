@@ -8,7 +8,8 @@ edition = "2021"
 [dependencies]
 sync-committee-primitives = { path= "../primitives" }
 sync-committee-verifier = { path= "../verifier" }
-ssz-rs = { git = "https://github.com/polytope-labs/ssz-rs",  branch = "main" }
+#ssz-rs = { git = "https://github.com/polytope-labs/ssz-rs",  branch = "main" }
+ssz-rs = { git = "https://github.com/Entropy-Foundation/ssz-rs", branch = "eth_hypernova"}
 reqwest = {version="0.11.14", features=["json"]}
 serde = { version = "1.0.185", features = ["derive"] }
 serde_json = { version = "1.0.81"}
