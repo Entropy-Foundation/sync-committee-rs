@@ -281,6 +281,7 @@ pub struct BeaconBlockBody<
 		MAX_WITHDRAWALS_PER_PAYLOAD,
 	>,
 	pub bls_to_execution_changes: List<SignedBlsToExecutionChange, MAX_BLS_TO_EXECUTION_CHANGES>,
+	pub blob_kzg_commitments: List<ByteVector<48>, 4096>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, SimpleSerialize, codec::Encode, codec::Decode)]
