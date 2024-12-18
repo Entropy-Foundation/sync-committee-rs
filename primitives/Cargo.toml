@@ -35,3 +35,5 @@ std = [
 ]
 mainnet = []
 goerli = []
+sepolia = []
+serialize = []

@@ -81,8 +81,11 @@ pub use goerli::*;
 #[cfg(feature = "mainnet")]
 pub use mainnet::*;
 
+#[cfg(feature = "sepolia")]
+pub use sepolia::*;
+
 use crate::ssz::ByteVector;
-#[cfg(all(not(feature = "mainnet"), not(feature = "goerli")))]
+#[cfg(all(not(feature = "mainnet"), not(feature = "goerli"), not(feature = "sepolia")))]
 pub use devnet::*;
 
 #[cfg(feature = "goerli")]
@@ -98,6 +101,8 @@ pub mod goerli {
 	pub const BELLATRIX_FORK_EPOCH: Epoch = 112260;
 	pub const CAPELLA_FORK_EPOCH: Epoch = 162304;
 	pub const CAPELLA_FORK_VERSION: Version = hex_literal::hex!("03001020");
+	pub const DENEB_FORK_EPOCH: Epoch = 231680;
+	pub const DENEB_FORK_VERSION: Version = hex_literal::hex!("04001020");
 }
 
 #[cfg(feature = "mainnet")]
@@ -113,9 +118,28 @@ pub mod mainnet {
 	pub const BELLATRIX_FORK_EPOCH: Epoch = 144896;
 	pub const CAPELLA_FORK_EPOCH: Epoch = 194048;
 	pub const CAPELLA_FORK_VERSION: Version = hex_literal::hex!("03000000");
+	pub const DENEB_FORK_EPOCH: Epoch = u64::MAX;
+	pub const DENEB_FORK_VERSION: Version = hex_literal::hex!("04000000");
 }
 
-#[cfg(all(not(feature = "mainnet"), not(feature = "goerli")))]
+#[cfg(feature = "sepolia")]
+pub mod sepolia {
+	use super::*;
+	pub const SLOTS_PER_EPOCH: Slot = 32;
+	pub const GENESIS_VALIDATORS_ROOT: [u8; 32] =
+		hex_literal::hex!("d8ea171f3c94aea21ebc42a1ed61052acf3f9209c00e4efbaaddac09ed9b8078");
+	pub const BELLATRIX_FORK_VERSION: Version = hex_literal::hex!("90000071");
+	pub const ALTAIR_FORK_VERSION: Version = hex_literal::hex!("90000070");
+	pub const GENESIS_FORK_VERSION: Version = hex_literal::hex!("90000069");
+	pub const ALTAIR_FORK_EPOCH: Epoch = 50;
+	pub const BELLATRIX_FORK_EPOCH: Epoch = 100;
+	pub const CAPELLA_FORK_EPOCH: Epoch = 56832;
+	pub const CAPELLA_FORK_VERSION: Version = hex_literal::hex!("90000072");
+	pub const DENEB_FORK_EPOCH: Epoch = u64::MAX;
+	pub const DENEB_FORK_VERSION: Version = hex_literal::hex!("90000073");
+}
+
+#[cfg(all(not(feature = "mainnet"), not(feature = "goerli"), not(feature = "sepolia")))]
 pub mod devnet {
 	use super::*;
 	use hex_literal::hex;
@@ -129,4 +153,13 @@ pub mod devnet {
 	pub const BELLATRIX_FORK_EPOCH: Epoch = 0;
 	pub const CAPELLA_FORK_EPOCH: Epoch = 2;
 	pub const CAPELLA_FORK_VERSION: Version = hex!("52525503");
+	pub const DENEB_FORK_EPOCH: Epoch = u64::MAX;
+	pub const DENEB_FORK_VERSION: Version = hex_literal::hex!("52525504");
 }
+
+pub const FORKS: [(Epoch, Version); 4] = [
+	(ALTAIR_FORK_EPOCH, ALTAIR_FORK_VERSION),
+	(BELLATRIX_FORK_EPOCH, BELLATRIX_FORK_VERSION),
+	(CAPELLA_FORK_EPOCH, CAPELLA_FORK_VERSION),
+	(DENEB_FORK_EPOCH, DENEB_FORK_VERSION),
+];
