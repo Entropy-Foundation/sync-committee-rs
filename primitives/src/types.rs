@@ -24,7 +24,7 @@ pub struct ExecutionPayloadProof {
 
 /// Holds the neccessary proofs required to verify a header in the `block_roots` field
 /// either in [`BeaconState`] or [`HistoricalBatch`].
-#[derive(Debug, Clone, PartialEq, Eq, codec::Encode, codec::Decode)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct BlockRootsProof {
 	/// Generalized index of the header in the `block_roots` list.
 	pub block_header_index: u64,
@@ -34,7 +34,7 @@ pub struct BlockRootsProof {
 
 /// The block header ancestry proof, this is an enum because the header may either exist in
 /// `state.block_roots` or `state.historical_roots`.
-#[derive(Debug, Clone, PartialEq, Eq, codec::Encode, codec::Decode)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum AncestryProof {
 	/// This variant defines the proof data for a beacon chain header in the `state.block_roots`
 	BlockRoots {
@@ -63,7 +63,7 @@ pub enum AncestryProof {
 
 /// This defines the neccesary data needed to prove ancestor blocks, relative to the finalized
 /// header.
-#[derive(Debug, Clone, PartialEq, Eq, codec::Encode, codec::Decode)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AncestorBlock {
 	/// The actual beacon chain header
 	pub header: BeaconBlockHeader,
