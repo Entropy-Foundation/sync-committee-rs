@@ -40,6 +40,7 @@ pub const MAX_VALIDATORS_PER_WITHDRAWALS_SWEEP: usize = 16384;
 pub const MAX_COMMITTEES_PER_SLOT: usize = 64;
 pub const MAX_VALIDATORS_PER_COMMITTEE: usize = 2048 * MAX_COMMITTEES_PER_SLOT;
 
+pub const SLOTS_PER_EPOCH: Slot = 32;
 pub const EPOCHS_PER_ETH1_VOTING_PERIOD: Epoch = 64;
 pub const SLOTS_PER_HISTORICAL_ROOT: usize = 8192;
 pub const EPOCHS_PER_HISTORICAL_VECTOR: usize = 65536;
@@ -154,7 +155,7 @@ pub mod sepolia {
 		const CAPELLA_FORK_EPOCH: Epoch = 56832;
 		const CAPELLA_FORK_VERSION: Version = hex_literal::hex!("90000072");
 		const DENEB_FORK_EPOCH: Epoch = 132608;
-		const DENEB_FORK_VERSION: Version = hex!("90000073");
+		const DENEB_FORK_VERSION: Version = hex_literal::hex!("90000073");
 		const EPOCHS_PER_SYNC_COMMITTEE_PERIOD: Epoch = 256;
 		const EXECUTION_PAYLOAD_STATE_ROOT_INDEX: u64 = 34;
 		const EXECUTION_PAYLOAD_BLOCK_NUMBER_INDEX: u64 = 38;
