@@ -37,7 +37,9 @@ pub const MAX_WITHDRAWALS_PER_PAYLOAD: usize = 16;
 pub const MAX_BLS_TO_EXECUTION_CHANGES: usize = 16;
 pub const MAX_VALIDATORS_PER_WITHDRAWALS_SWEEP: usize = 16384;
 
-pub const MAX_VALIDATORS_PER_COMMITTEE: usize = 2048;
+pub const MAX_COMMITTEES_PER_SLOT: usize = 64;
+pub const MAX_VALIDATORS_PER_COMMITTEE: usize = 2048 * MAX_COMMITTEES_PER_SLOT;
+
 pub const EPOCHS_PER_ETH1_VOTING_PERIOD: Epoch = 64;
 pub const SLOTS_PER_HISTORICAL_ROOT: usize = 8192;
 pub const EPOCHS_PER_HISTORICAL_VECTOR: usize = 65536;
@@ -45,8 +47,8 @@ pub const EPOCHS_PER_SLASHINGS_VECTOR: usize = 8192;
 pub const HISTORICAL_ROOTS_LIMIT: usize = 16_777_216;
 pub const VALIDATOR_REGISTRY_LIMIT: usize = 2usize.saturating_pow(40);
 pub const MAX_PROPOSER_SLASHINGS: usize = 16;
-pub const MAX_ATTESTER_SLASHINGS: usize = 2;
-pub const MAX_ATTESTATIONS: usize = 128;
+pub const MAX_ATTESTER_SLASHINGS: usize = 1;
+pub const MAX_ATTESTATIONS: usize = 8;
 pub const MAX_DEPOSITS: usize = 16;
 pub const MAX_VOLUNTARY_EXITS: usize = 16;
 pub const JUSTIFICATION_BITS_LENGTH: usize = 4;
@@ -65,15 +67,19 @@ pub const EXECUTION_PAYLOAD_STATE_ROOT_INDEX: u64 = 18;
 pub const EXECUTION_PAYLOAD_BLOCK_NUMBER_INDEX: u64 = 22;
 pub const EXECUTION_PAYLOAD_INDEX: u64 = 56;
 pub const NEXT_SYNC_COMMITTEE_INDEX: u64 = 55;
-pub const BLOCK_ROOTS_INDEX: u64 = 37;
-pub const HISTORICAL_ROOTS_INDEX: u64 = 39;
-pub const HISTORICAL_BATCH_BLOCK_ROOTS_INDEX: u64 = 2;
 pub const EXECUTION_PAYLOAD_TIMESTAMP_INDEX: u64 = 25;
 pub const FINALIZED_ROOT_INDEX_LOG2: u64 = 5;
 pub const EXECUTION_PAYLOAD_INDEX_LOG2: u64 = 5;
 pub const NEXT_SYNC_COMMITTEE_INDEX_LOG2: u64 = 5;
-pub const BLOCK_ROOTS_INDEX_LOG2: u64 = 5;
-pub const HISTORICAL_ROOTS_INDEX_LOG2: u64 = 5;
+
+pub const MAX_DEPOSIT_REQUESTS_PER_PAYLOAD: usize = 2usize.saturating_pow(13);
+pub const MAX_WITHDRAWAL_REQUESTS_PER_PAYLOAD: usize = 2usize.saturating_pow(16);
+pub const MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD: usize = 2usize.saturating_pow(3);
+
+pub const PENDING_DEPOSITS_LIMIT: usize = 2usize.saturating_pow(27);
+pub const PENDING_PARTIAL_WITHDRAWALS_LIMIT: usize = 2usize.saturating_pow(27);
+pub const PENDING_CONSOLIDATIONS_LIMIT: usize = 2usize.saturating_pow(18);
+
 
 #[cfg(feature = "goerli")]
 pub use goerli::*;
@@ -108,42 +114,66 @@ pub mod goerli {
 #[cfg(feature = "mainnet")]
 pub mod mainnet {
 	use super::*;
-	pub const SLOTS_PER_EPOCH: Slot = 32;
-	pub const GENESIS_VALIDATORS_ROOT: [u8; 32] =
-		hex_literal::hex!("4b363db94e286120d76eb905340fdd4e54bfe9f06bf33ff6cf5ad27f511bfe95");
-	pub const BELLATRIX_FORK_VERSION: Version = hex_literal::hex!("02000000");
-	pub const ALTAIR_FORK_VERSION: Version = hex_literal::hex!("01000000");
-	pub const GENESIS_FORK_VERSION: Version = hex_literal::hex!("00000000");
-	pub const ALTAIR_FORK_EPOCH: Epoch = 74240;
-	pub const BELLATRIX_FORK_EPOCH: Epoch = 144896;
-	pub const CAPELLA_FORK_EPOCH: Epoch = 194048;
-	pub const CAPELLA_FORK_VERSION: Version = hex_literal::hex!("03000000");
-	pub const DENEB_FORK_EPOCH: Epoch = u64::MAX;
-	pub const DENEB_FORK_VERSION: Version = hex_literal::hex!("04000000");
+	const SLOTS_PER_EPOCH: Slot = 32;
+		const GENESIS_VALIDATORS_ROOT: [u8; 32] =
+			hex_literal::hex!("4b363db94e286120d76eb905340fdd4e54bfe9f06bf33ff6cf5ad27f511bfe95");
+		const BELLATRIX_FORK_VERSION: Version = hex_literal::hex!("02000000");
+		const ALTAIR_FORK_VERSION: Version = hex_literal::hex!("01000000");
+		const GENESIS_FORK_VERSION: Version = hex_literal::hex!("00000000");
+		const ALTAIR_FORK_EPOCH: Epoch = 74240;
+		const BELLATRIX_FORK_EPOCH: Epoch = 144896;
+		const CAPELLA_FORK_EPOCH: Epoch = 194048;
+		const CAPELLA_FORK_VERSION: Version = hex_literal::hex!("03000000");
+		const DENEB_FORK_EPOCH: Epoch = 269568;
+		const DENEB_FORK_VERSION: Version = hex_literal::hex!("04000000");
+		const EPOCHS_PER_SYNC_COMMITTEE_PERIOD: Epoch = 256;
+		const EXECUTION_PAYLOAD_STATE_ROOT_INDEX: u64 = 34;
+		const EXECUTION_PAYLOAD_BLOCK_NUMBER_INDEX: u64 = 38;
+		const EXECUTION_PAYLOAD_TIMESTAMP_INDEX: u64 = 41;
+		const EXECUTION_PAYLOAD_INDEX: u64 = EXECUTION_PAYLOAD_INDEX;
+		const NEXT_SYNC_COMMITTEE_INDEX: u64 = NEXT_SYNC_COMMITTEE_INDEX;
+		const FINALIZED_ROOT_INDEX: u64 = FINALIZED_ROOT_INDEX;
+		const FINALIZED_ROOT_INDEX_LOG2: u64 = FINALIZED_ROOT_INDEX_LOG2;
+		const EXECUTION_PAYLOAD_INDEX_LOG2: u64 = EXECUTION_PAYLOAD_INDEX_LOG2;
+		const NEXT_SYNC_COMMITTEE_INDEX_LOG2: u64 = NEXT_SYNC_COMMITTEE_INDEX_LOG2;
+		const ELECTRA_FORK_VERSION: Version = hex_literal::hex!("05000000");
+		const ELECTRA_FORK_EPOCH: Epoch = Epoch::MAX;
 }
 
 #[cfg(feature = "sepolia")]
 pub mod sepolia {
 	use super::*;
-	pub const SLOTS_PER_EPOCH: Slot = 32;
-	pub const GENESIS_VALIDATORS_ROOT: [u8; 32] =
-		hex_literal::hex!("d8ea171f3c94aea21ebc42a1ed61052acf3f9209c00e4efbaaddac09ed9b8078");
-	pub const BELLATRIX_FORK_VERSION: Version = hex_literal::hex!("90000071");
-	pub const ALTAIR_FORK_VERSION: Version = hex_literal::hex!("90000070");
-	pub const GENESIS_FORK_VERSION: Version = hex_literal::hex!("90000069");
-	pub const ALTAIR_FORK_EPOCH: Epoch = 50;
-	pub const BELLATRIX_FORK_EPOCH: Epoch = 100;
-	pub const CAPELLA_FORK_EPOCH: Epoch = 56832;
-	pub const CAPELLA_FORK_VERSION: Version = hex_literal::hex!("90000072");
-	pub const DENEB_FORK_EPOCH: Epoch = u64::MAX;
-	pub const DENEB_FORK_VERSION: Version = hex_literal::hex!("90000073");
+	const SLOTS_PER_EPOCH: Slot = 32;
+		const GENESIS_VALIDATORS_ROOT: [u8; 32] =
+			hex_literal::hex!("d8ea171f3c94aea21ebc42a1ed61052acf3f9209c00e4efbaaddac09ed9b8078");
+		const BELLATRIX_FORK_VERSION: Version = hex_literal::hex!("90000071");
+		const ALTAIR_FORK_VERSION: Version = hex_literal::hex!("90000070");
+		const GENESIS_FORK_VERSION: Version = hex_literal::hex!("90000069");
+		const ALTAIR_FORK_EPOCH: Epoch = 50;
+		const BELLATRIX_FORK_EPOCH: Epoch = 100;
+		const CAPELLA_FORK_EPOCH: Epoch = 56832;
+		const CAPELLA_FORK_VERSION: Version = hex_literal::hex!("90000072");
+		const DENEB_FORK_EPOCH: Epoch = 132608;
+		const DENEB_FORK_VERSION: Version = hex!("90000073");
+		const EPOCHS_PER_SYNC_COMMITTEE_PERIOD: Epoch = 256;
+		const EXECUTION_PAYLOAD_STATE_ROOT_INDEX: u64 = 34;
+		const EXECUTION_PAYLOAD_BLOCK_NUMBER_INDEX: u64 = 38;
+		const EXECUTION_PAYLOAD_TIMESTAMP_INDEX: u64 = 41;
+		const EXECUTION_PAYLOAD_INDEX: u64 = 88;
+		const NEXT_SYNC_COMMITTEE_INDEX: u64 = 87;
+		const FINALIZED_ROOT_INDEX: u64 = 84;
+		const FINALIZED_ROOT_INDEX_LOG2: u64 = 6;
+		const EXECUTION_PAYLOAD_INDEX_LOG2: u64 = 6;
+		const NEXT_SYNC_COMMITTEE_INDEX_LOG2: u64 = 6;
+		const ELECTRA_FORK_VERSION: Version = hex_literal::hex!("90000074");
+		const ELECTRA_FORK_EPOCH: Epoch = 222464;
 }
 
 #[cfg(all(not(feature = "mainnet"), not(feature = "goerli"), not(feature = "sepolia")))]
 pub mod devnet {
 	use super::*;
 	use hex_literal::hex;
-	pub const SLOTS_PER_EPOCH: Slot = 6;
+	pub const SLOTS_PER_EPOCH: Slot = 32;
 	pub const GENESIS_VALIDATORS_ROOT: [u8; 32] =
 		hex_literal::hex!("83431ec7fcf92cfc44947fc0418e831c25e1d0806590231c439830db7ad54fda");
 	pub const BELLATRIX_FORK_VERSION: Version = hex!("52525502");
@@ -151,15 +181,28 @@ pub mod devnet {
 	pub const GENESIS_FORK_VERSION: Version = hex!("52525500");
 	pub const ALTAIR_FORK_EPOCH: Epoch = 0;
 	pub const BELLATRIX_FORK_EPOCH: Epoch = 0;
-	pub const CAPELLA_FORK_EPOCH: Epoch = 2;
+	pub const CAPELLA_FORK_EPOCH: Epoch = 0;
 	pub const CAPELLA_FORK_VERSION: Version = hex!("52525503");
-	pub const DENEB_FORK_EPOCH: Epoch = u64::MAX;
-	pub const DENEB_FORK_VERSION: Version = hex_literal::hex!("52525504");
+	pub const DENEB_FORK_EPOCH: Epoch = 0;
+	pub const DENEB_FORK_VERSION: Version = hex!("52525504");
+	pub const EPOCHS_PER_SYNC_COMMITTEE_PERIOD: Epoch = 4;
+	pub const EXECUTION_PAYLOAD_STATE_ROOT_INDEX: u64 = 34;
+	pub const EXECUTION_PAYLOAD_BLOCK_NUMBER_INDEX: u64 = 38;
+	pub const EXECUTION_PAYLOAD_TIMESTAMP_INDEX: u64 = 41;
+	pub const EXECUTION_PAYLOAD_INDEX: u64 = 56;
+	pub const NEXT_SYNC_COMMITTEE_INDEX: u64 = 55;
+	pub const FINALIZED_ROOT_INDEX: u64 = 52;
+	pub const FINALIZED_ROOT_INDEX_LOG2: u64 = 5;
+	pub const EXECUTION_PAYLOAD_INDEX_LOG2: u64 = 5;
+	pub const NEXT_SYNC_COMMITTEE_INDEX_LOG2: u64 = 5;
+	pub const ELECTRA_FORK_VERSION: Version = hex_literal::hex!("52525505");
+	pub const ELECTRA_FORK_EPOCH: Epoch = Epoch::MAX;
 }
 
-pub const FORKS: [(Epoch, Version); 4] = [
+pub const FORKS: [(Epoch, Version); 5] = [
 	(ALTAIR_FORK_EPOCH, ALTAIR_FORK_VERSION),
 	(BELLATRIX_FORK_EPOCH, BELLATRIX_FORK_VERSION),
 	(CAPELLA_FORK_EPOCH, CAPELLA_FORK_VERSION),
 	(DENEB_FORK_EPOCH, DENEB_FORK_VERSION),
+	(ELECTRA_FORK_EPOCH, ELECTRA_FORK_VERSION)
 ];

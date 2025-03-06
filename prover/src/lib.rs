@@ -24,16 +24,17 @@ use primitive_types::H256;
 use ssz_rs::{List, Merkleized, Node, Vector};
 use sync_committee_primitives::{
 	constants::{
-		BlsPublicKey, Root, ValidatorIndex, BLOCK_ROOTS_INDEX, BYTES_PER_LOGS_BLOOM,
-		EPOCHS_PER_HISTORICAL_VECTOR, EPOCHS_PER_SLASHINGS_VECTOR, ETH1_DATA_VOTES_BOUND,
-		EXECUTION_PAYLOAD_BLOCK_NUMBER_INDEX, EXECUTION_PAYLOAD_INDEX,
-		EXECUTION_PAYLOAD_STATE_ROOT_INDEX, EXECUTION_PAYLOAD_TIMESTAMP_INDEX,
-		FINALIZED_ROOT_INDEX, HISTORICAL_ROOTS_LIMIT, MAX_ATTESTATIONS, MAX_ATTESTER_SLASHINGS,
-		MAX_BLS_TO_EXECUTION_CHANGES, MAX_BYTES_PER_TRANSACTION, MAX_DEPOSITS,
-		MAX_EXTRA_DATA_BYTES, MAX_PROPOSER_SLASHINGS, MAX_TRANSACTIONS_PER_PAYLOAD,
-		MAX_VALIDATORS_PER_COMMITTEE, MAX_VOLUNTARY_EXITS, MAX_WITHDRAWALS_PER_PAYLOAD,
-		NEXT_SYNC_COMMITTEE_INDEX, SLOTS_PER_EPOCH, SLOTS_PER_HISTORICAL_ROOT, SYNC_COMMITTEE_SIZE,
-		VALIDATOR_REGISTRY_LIMIT,
+		BlsPublicKey, Root, ValidatorIndex,BYTES_PER_LOGS_BLOOM, EPOCHS_PER_HISTORICAL_VECTOR,
+		EPOCHS_PER_SLASHINGS_VECTOR, HISTORICAL_ROOTS_LIMIT, MAX_ATTESTATIONS, ETH1_DATA_VOTES_BOUND,
+		MAX_ATTESTER_SLASHINGS, MAX_BLS_TO_EXECUTION_CHANGES, MAX_BYTES_PER_TRANSACTION,
+		MAX_COMMITTEES_PER_SLOT, MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD, MAX_DEPOSITS,
+		MAX_DEPOSIT_REQUESTS_PER_PAYLOAD, MAX_EXTRA_DATA_BYTES, MAX_PROPOSER_SLASHINGS,
+		MAX_TRANSACTIONS_PER_PAYLOAD, MAX_VALIDATORS_PER_COMMITTEE, MAX_VOLUNTARY_EXITS,
+		MAX_WITHDRAWALS_PER_PAYLOAD, MAX_WITHDRAWAL_REQUESTS_PER_PAYLOAD,
+		PENDING_CONSOLIDATIONS_LIMIT, PENDING_DEPOSITS_LIMIT, PENDING_PARTIAL_WITHDRAWALS_LIMIT,
+		SLOTS_PER_HISTORICAL_ROOT, SYNC_COMMITTEE_SIZE, VALIDATOR_REGISTRY_LIMIT,
+		EXECUTION_PAYLOAD_STATE_ROOT_INDEX,  SLOTS_PER_EPOCH, FINALIZED_ROOT_INDEX, NEXT_SYNC_COMMITTEE_INDEX,
+		EXECUTION_PAYLOAD_BLOCK_NUMBER_INDEX, EXECUTION_PAYLOAD_TIMESTAMP_INDEX, EXECUTION_PAYLOAD_INDEX
 	},
 	types::{
 		AncestryProof, BlockRootsProof, ExecutionPayloadProof, FinalityProof, LightClientUpdate,
@@ -41,7 +42,7 @@ use sync_committee_primitives::{
 	},
 	util::{
 		compute_epoch_at_slot, compute_sync_committee_period_at_slot,
-		should_get_sync_committee_update,
+		should_get_sync_committee_update, 
 	},
 };
 
@@ -54,12 +55,12 @@ pub type BeaconStateType = BeaconState<
 	VALIDATOR_REGISTRY_LIMIT,
 	EPOCHS_PER_HISTORICAL_VECTOR,
 	EPOCHS_PER_SLASHINGS_VECTOR,
-	MAX_VALIDATORS_PER_COMMITTEE,
 	SYNC_COMMITTEE_SIZE,
 	BYTES_PER_LOGS_BLOOM,
 	MAX_EXTRA_DATA_BYTES,
-	MAX_BYTES_PER_TRANSACTION,
-	MAX_TRANSACTIONS_PER_PAYLOAD,
+	PENDING_DEPOSITS_LIMIT,
+	PENDING_CONSOLIDATIONS_LIMIT,
+	PENDING_PARTIAL_WITHDRAWALS_LIMIT,
 >;
 
 #[derive(Clone)]
@@ -115,6 +116,10 @@ impl SyncCommitteeProver {
 			MAX_TRANSACTIONS_PER_PAYLOAD,
 			MAX_WITHDRAWALS_PER_PAYLOAD,
 			MAX_BLS_TO_EXECUTION_CHANGES,
+			MAX_COMMITTEES_PER_SLOT,
+			MAX_DEPOSIT_REQUESTS_PER_PAYLOAD,
+			MAX_WITHDRAWAL_REQUESTS_PER_PAYLOAD,
+			MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD,
 		>,
 		anyhow::Error,
 	> {
@@ -346,38 +351,38 @@ pub fn prove_finalized_header(state: &mut BeaconStateType) -> anyhow::Result<Vec
 	Ok(proof)
 }
 
-pub fn prove_block_roots_proof(
-	state: &mut BeaconStateType,
-	mut header: BeaconBlockHeader,
-) -> anyhow::Result<AncestryProof> {
-	// Check if block root should still be part of the block roots vector on the beacon state
-	let epoch_for_header = compute_epoch_at_slot(header.slot) as usize;
-	let epoch_for_state = compute_epoch_at_slot(state.slot) as usize;
+// pub fn prove_block_roots_proof(
+// 	state: &mut BeaconStateType,
+// 	mut header: BeaconBlockHeader,
+// ) -> anyhow::Result<AncestryProof> {
+// 	// Check if block root should still be part of the block roots vector on the beacon state
+// 	let epoch_for_header = compute_epoch_at_slot(header.slot) as usize;
+// 	let epoch_for_state = compute_epoch_at_slot(state.slot) as usize;
 
-	if epoch_for_state.saturating_sub(epoch_for_header) >=
-		SLOTS_PER_HISTORICAL_ROOT / SLOTS_PER_EPOCH as usize
-	{
-		// todo:  Historical root proofs
-		unimplemented!()
-	} else {
-		// Get index of block root in the block roots
-		let block_root = header.hash_tree_root().expect("hash tree root should be valid");
-		let block_index = state
-			.block_roots
-			.as_ref()
-			.into_iter()
-			.position(|root| root == &block_root)
-			.expect("Block root should exist in block_roots");
+// 	if epoch_for_state.saturating_sub(epoch_for_header) >=
+// 		SLOTS_PER_HISTORICAL_ROOT / SLOTS_PER_EPOCH as usize
+// 	{
+// 		// todo:  Historical root proofs
+// 		unimplemented!()
+// 	} else {
+// 		// Get index of block root in the block roots
+// 		let block_root = header.hash_tree_root().expect("hash tree root should be valid");
+// 		let block_index = state
+// 			.block_roots
+// 			.as_ref()
+// 			.into_iter()
+// 			.position(|root| root == &block_root)
+// 			.expect("Block root should exist in block_roots");
 
-		let proof = ssz_rs::generate_proof(&mut state.block_roots, &[block_index])?;
+// 		let proof = ssz_rs::generate_proof(&mut state.block_roots, &[block_index])?;
 
-		let block_roots_proof =
-			BlockRootsProof { block_header_index: block_index as u64, block_header_branch: proof };
+// 		let block_roots_proof =
+// 			BlockRootsProof { block_header_index: block_index as u64, block_header_branch: proof };
 
-		let block_roots_branch = ssz_rs::generate_proof(state, &[BLOCK_ROOTS_INDEX as usize])?;
-		Ok(AncestryProof::BlockRoots { block_roots_proof, block_roots_branch })
-	}
-}
+// 		let block_roots_branch = ssz_rs::generate_proof(state, &[BLOCK_ROOTS_INDEX as usize])?;
+// 		Ok(AncestryProof::BlockRoots { block_roots_proof, block_roots_branch })
+// 	}
+// }
 
 pub fn eth_aggregate_public_keys(points: &[BlsPublicKey]) -> anyhow::Result<BlsPublicKey> {
 	let points = points

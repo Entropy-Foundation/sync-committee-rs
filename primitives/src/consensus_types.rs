@@ -102,10 +102,11 @@ pub struct AttesterSlashing<const MAX_VALIDATORS_PER_COMMITTEE: usize> {
 
 #[derive(Default, Debug, SimpleSerialize, codec::Encode, codec::Decode, Clone, PartialEq, Eq)]
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Attestation<const MAX_VALIDATORS_PER_COMMITTEE: usize> {
+pub struct Attestation<const MAX_VALIDATORS_PER_COMMITTEE: usize, const MAX_COMMITTEES_PER_SLOT: usize> {
 	pub aggregation_bits: Bitlist<MAX_VALIDATORS_PER_COMMITTEE>,
 	pub data: AttestationData,
 	pub signature: BlsSignature,
+	pub committee_bits: Bitvector<MAX_COMMITTEES_PER_SLOT> // In Electra
 }
 
 #[derive(Default, Debug, SimpleSerialize, codec::Encode, codec::Decode, Clone, PartialEq, Eq)]
@@ -270,6 +271,10 @@ pub struct BeaconBlockBody<
 	const MAX_TRANSACTIONS_PER_PAYLOAD: usize,
 	const MAX_WITHDRAWALS_PER_PAYLOAD: usize,
 	const MAX_BLS_TO_EXECUTION_CHANGES: usize,
+	const MAX_COMMITTEES_PER_SLOT: usize,
+	const MAX_DEPOSIT_REQUESTS_PER_PAYLOAD: usize,
+	const MAX_WITHDRAWAL_REQUESTS_PER_PAYLOAD: usize,
+	const MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD: usize,
 > {
 	pub randao_reveal: BlsSignature,
 	pub eth1_data: Eth1Data,
@@ -277,7 +282,7 @@ pub struct BeaconBlockBody<
 	pub proposer_slashings: List<ProposerSlashing, MAX_PROPOSER_SLASHINGS>,
 	pub attester_slashings:
 		List<AttesterSlashing<MAX_VALIDATORS_PER_COMMITTEE>, MAX_ATTESTER_SLASHINGS>,
-	pub attestations: List<Attestation<MAX_VALIDATORS_PER_COMMITTEE>, MAX_ATTESTATIONS>,
+	pub attestations: List<Attestation<MAX_VALIDATORS_PER_COMMITTEE, MAX_COMMITTEES_PER_SLOT>, MAX_ATTESTATIONS>,
 	pub deposits: List<Deposit, MAX_DEPOSITS>,
 	pub voluntary_exits: List<SignedVoluntaryExit, MAX_VOLUNTARY_EXITS>,
 	pub sync_aggregate: SyncAggregate<SYNC_COMMITTEE_SIZE>,
@@ -290,6 +295,11 @@ pub struct BeaconBlockBody<
 	>,
 	pub bls_to_execution_changes: List<SignedBlsToExecutionChange, MAX_BLS_TO_EXECUTION_CHANGES>,
 	pub blob_kzg_commitments: List<ByteVector<48>, 4096>,
+	pub execution_requests: ExecutionRequests<
+		MAX_DEPOSIT_REQUESTS_PER_PAYLOAD,
+		MAX_WITHDRAWAL_REQUESTS_PER_PAYLOAD,
+		MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD,
+	>, // In Electra
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, SimpleSerialize, codec::Encode, codec::Decode)]
@@ -308,6 +318,10 @@ pub struct BeaconBlock<
 	const MAX_TRANSACTIONS_PER_PAYLOAD: usize,
 	const MAX_WITHDRAWALS_PER_PAYLOAD: usize,
 	const MAX_BLS_TO_EXECUTION_CHANGES: usize,
+	const MAX_COMMITTEES_PER_SLOT: usize,
+	const MAX_DEPOSIT_REQUESTS_PER_PAYLOAD: usize,
+	const MAX_WITHDRAWAL_REQUESTS_PER_PAYLOAD: usize,
+	const MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD: usize
 > {
 	#[serde(with = "crate::serde::as_string")]
 	pub slot: Slot,
@@ -329,6 +343,10 @@ pub struct BeaconBlock<
 		MAX_TRANSACTIONS_PER_PAYLOAD,
 		MAX_WITHDRAWALS_PER_PAYLOAD,
 		MAX_BLS_TO_EXECUTION_CHANGES,
+		MAX_COMMITTEES_PER_SLOT,
+		MAX_DEPOSIT_REQUESTS_PER_PAYLOAD,
+		MAX_WITHDRAWAL_REQUESTS_PER_PAYLOAD,
+		MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD,
 	>,
 }
 #[derive(Default, Debug, SimpleSerialize, Clone, PartialEq, Eq, codec::Encode, codec::Decode)]
@@ -357,6 +375,87 @@ pub struct HistoricalSummary {
 	pub state_summary_root: Root,
 }
 
+// In Electra
+#[derive(Default, Debug, SimpleSerialize, codec::Encode, codec::Decode, Clone, PartialEq, Eq)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct DepositRequest {
+	pub pub_key: BlsPublicKey,
+	pub withdrawal_credentials: Bytes32,
+	#[serde(with = "crate::serde::as_string")]
+	pub amount: Gwei,
+	pub signature: BlsSignature,
+	#[serde(with = "crate::serde::as_string")]
+	pub index: u64,
+}
+
+// In Electra
+#[derive(Default, Debug, SimpleSerialize, codec::Encode, codec::Decode, Clone, PartialEq, Eq)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct WithdrawalRequest {
+	pub source_address: ExecutionAddress,
+	pub validator_pubkey: BlsPublicKey,
+	#[serde(with = "crate::serde::as_string")]
+	pub amount: Gwei,
+}
+
+// In Electra
+#[derive(Default, Debug, SimpleSerialize, codec::Encode, codec::Decode, Clone, PartialEq, Eq)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct ConsolidationRequest {
+	pub source_address: ExecutionAddress,
+	pub source_pubkey: BlsPublicKey,
+	pub target_pubkey: BlsPublicKey,
+}
+
+// In Electra
+#[derive(Default, Debug, SimpleSerialize, codec::Encode, codec::Decode, Clone, PartialEq, Eq)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct ExecutionRequests<
+	const MAX_DEPOSIT_REQUESTS_PER_PAYLOAD: usize,
+	const MAX_WITHDRAWAL_REQUESTS_PER_PAYLOAD: usize,
+	const MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD: usize,
+> {
+	pub deposits: List<DepositRequest, MAX_DEPOSIT_REQUESTS_PER_PAYLOAD>,
+	pub withdrawals: List<WithdrawalRequest, MAX_WITHDRAWAL_REQUESTS_PER_PAYLOAD>,
+	pub consolidations: List<ConsolidationRequest, MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD>,
+}
+
+
+// In Electra
+#[derive(Default, Debug, Clone, SimpleSerialize, PartialEq, Eq, codec::Encode, codec::Decode)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct PendingPartialWithdrawal {
+	#[serde(with = "crate::serde::as_string")]
+	pub validator_index: ValidatorIndex,
+	#[serde(with = "crate::serde::as_string")]
+	pub amount: Gwei,
+	#[serde(with = "crate::serde::as_string")]
+	pub withdrawable_epoch: Epoch,
+}
+
+// In Electra
+#[derive(Default, Debug, Clone, SimpleSerialize, PartialEq, Eq, codec::Encode, codec::Decode)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct PendingConsolidation {
+	#[serde(with = "crate::serde::as_string")]
+	pub source_index: ValidatorIndex,
+	#[serde(with = "crate::serde::as_string")]
+	pub target_index: ValidatorIndex,
+}
+
+// In Electra
+#[derive(Default, Debug, Clone, SimpleSerialize, PartialEq, Eq, codec::Encode, codec::Decode)]
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct PendingDeposit {
+	pub pubkey: BlsPublicKey,
+	pub withdrawal_credentials: Bytes32,
+	#[serde(with = "crate::serde::as_string")]
+	pub amount: Gwei,
+	pub signature: BlsSignature,
+	#[serde(with = "crate::serde::as_string")]
+	pub slot: Slot,
+}
+
 #[derive(Default, Debug, SimpleSerialize, Clone, PartialEq, Eq, codec::Encode, codec::Decode)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct BeaconState<
@@ -366,12 +465,13 @@ pub struct BeaconState<
 	const VALIDATOR_REGISTRY_LIMIT: usize,
 	const EPOCHS_PER_HISTORICAL_VECTOR: usize,
 	const EPOCHS_PER_SLASHINGS_VECTOR: usize,
-	const MAX_VALIDATORS_PER_COMMITTEE: usize,
+	// const MAX_VALIDATORS_PER_COMMITTEE: usize, // removed in Electra
 	const SYNC_COMMITTEE_SIZE: usize,
 	const BYTES_PER_LOGS_BLOOM: usize,
 	const MAX_EXTRA_DATA_BYTES: usize,
-	const MAX_BYTES_PER_TRANSACTION: usize,
-	const MAX_TRANSACTIONS_PER_PAYLOAD: usize,
+	const PENDING_DEPOSITS_LIMIT: usize,
+	const PENDING_CONSOLIDATIONS_LIMIT: usize,
+	const PENDING_PARTIAL_WITHDRAWALS_LIMIT: usize,
 > {
 	#[serde(with = "crate::serde::as_string")]
 	pub genesis_time: u64,
@@ -412,4 +512,22 @@ pub struct BeaconState<
 	#[serde(with = "crate::serde::as_string")]
 	pub next_withdrawal_validator_index: ValidatorIndex,
 	pub historical_summaries: List<HistoricalSummary, HISTORICAL_ROOTS_LIMIT>,
+	
+	// In Electra
+	#[serde(with = "crate::serde::as_string")]
+	pub deposit_requests_start_index: u64,
+	#[serde(with = "crate::serde::as_string")]
+	pub deposit_balance_to_consume: Gwei,
+	#[serde(with = "crate::serde::as_string")]
+	pub exit_balance_to_consume: Gwei,
+	#[serde(with = "crate::serde::as_string")]
+	pub earliest_exit_epoch: Epoch,
+	#[serde(with = "crate::serde::as_string")]
+	pub consolidation_balance_to_consume: Gwei,
+	#[serde(with = "crate::serde::as_string")]
+	pub earliest_consolidation_epoch: Epoch,
+	pending_deposits: List<PendingDeposit, PENDING_DEPOSITS_LIMIT>,
+	pending_partial_withdrawals: List<PendingPartialWithdrawal, PENDING_PARTIAL_WITHDRAWALS_LIMIT>,
+	pending_consolidations: List<PendingConsolidation, PENDING_CONSOLIDATIONS_LIMIT>,
+	// 
 }

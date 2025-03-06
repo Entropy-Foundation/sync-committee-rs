@@ -4,6 +4,8 @@ use crate::{
 		Domain, Root, Slot, Version, ALTAIR_FORK_EPOCH, ALTAIR_FORK_VERSION, BELLATRIX_FORK_EPOCH,
 		BELLATRIX_FORK_VERSION, CAPELLA_FORK_EPOCH, CAPELLA_FORK_VERSION,
 		EPOCHS_PER_SYNC_COMMITTEE_PERIOD, GENESIS_FORK_VERSION, SLOTS_PER_EPOCH,
+		DENEB_FORK_EPOCH, DENEB_FORK_VERSION, 
+		ELECTRA_FORK_EPOCH, ELECTRA_FORK_VERSION
 	},
 	domains::DomainType,
 };
@@ -30,7 +32,11 @@ pub fn compute_epoch_at_slot(slot: u64) -> u64 {
 #[cfg(not(feature = "testing"))]
 /// Return the fork version at the given ``epoch``.
 pub fn compute_fork_version(epoch: u64) -> [u8; 4] {
-	if epoch >= CAPELLA_FORK_EPOCH {
+	if epoch >= ELECTRA_FORK_EPOCH {
+		ELECTRA_FORK_VERSION
+	} else if epoch >= DENEB_FORK_EPOCH {
+		DENEB_FORK_VERSION
+	} else if epoch >= CAPELLA_FORK_EPOCH {
 		CAPELLA_FORK_VERSION
 	} else if epoch >= BELLATRIX_FORK_EPOCH {
 		BELLATRIX_FORK_VERSION
@@ -40,7 +46,6 @@ pub fn compute_fork_version(epoch: u64) -> [u8; 4] {
 		GENESIS_FORK_VERSION
 	}
 }
-
 pub fn compute_domain(
 	domain_type: DomainType,
 	fork_version: Option<Version>,
