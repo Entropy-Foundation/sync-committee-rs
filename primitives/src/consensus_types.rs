@@ -295,11 +295,11 @@ pub struct BeaconBlockBody<
 	>,
 	pub bls_to_execution_changes: List<SignedBlsToExecutionChange, MAX_BLS_TO_EXECUTION_CHANGES>,
 	pub blob_kzg_commitments: List<ByteVector<48>, 4096>,
-	pub execution_requests: ExecutionRequests<
-		MAX_DEPOSIT_REQUESTS_PER_PAYLOAD,
-		MAX_WITHDRAWAL_REQUESTS_PER_PAYLOAD,
-		MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD,
-	>, // In Electra
+	// pub execution_requests: ExecutionRequests<
+	// 	MAX_DEPOSIT_REQUESTS_PER_PAYLOAD,
+	// 	MAX_WITHDRAWAL_REQUESTS_PER_PAYLOAD,
+	// 	MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD,
+	// >, // In Electra
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, SimpleSerialize, codec::Encode, codec::Decode)]
