@@ -35,6 +35,8 @@ pub const SYNC_COMMITTEE_SIZE: usize = 512;
 pub const EPOCHS_PER_SYNC_COMMITTEE_PERIOD: Epoch = 256;
 pub const MAX_WITHDRAWALS_PER_PAYLOAD: usize = 16;
 pub const MAX_BLS_TO_EXECUTION_CHANGES: usize = 16;
+pub const MAX_BLOB_COMMITMENTS_PER_BLOCK: usize = 4096;
+
 pub const MAX_VALIDATORS_PER_WITHDRAWALS_SWEEP: usize = 16384;
 
 pub const MAX_COMMITTEES_PER_SLOT: usize = 64;
@@ -74,8 +76,8 @@ pub const EXECUTION_PAYLOAD_INDEX_LOG2: u64 = 5;
 pub const NEXT_SYNC_COMMITTEE_INDEX_LOG2: u64 = 5;
 
 pub const MAX_DEPOSIT_REQUESTS_PER_PAYLOAD: usize = 2usize.saturating_pow(13);
-pub const MAX_WITHDRAWAL_REQUESTS_PER_PAYLOAD: usize = 2usize.saturating_pow(16);
-pub const MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD: usize = 2usize.saturating_pow(3);
+pub const MAX_WITHDRAWAL_REQUESTS_PER_PAYLOAD: usize = 2usize.saturating_pow(4);
+pub const MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD: usize = 2usize.saturating_pow(1);
 
 pub const PENDING_DEPOSITS_LIMIT: usize = 2usize.saturating_pow(27);
 pub const PENDING_PARTIAL_WITHDRAWALS_LIMIT: usize = 2usize.saturating_pow(27);
