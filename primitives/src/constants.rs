@@ -87,10 +87,10 @@ pub const PENDING_CONSOLIDATIONS_LIMIT: usize = 2usize.saturating_pow(18);
 #[cfg(feature = "goerli")]
 pub use goerli::*;
 
-#[cfg(feature = "mainnet")]
+#[cfg(all(feature = "mainnet", not(feature = "goerli"), not(feature = "sepolia")))]
 pub use mainnet::*;
 
-#[cfg(feature = "sepolia")]
+#[cfg(all(feature = "sepolia", not(feature = "mainnet"), not(feature = "goerli")))]
 pub use sepolia::*;
 
 use crate::ssz::ByteVector;
@@ -141,13 +141,6 @@ pub mod mainnet {
 	pub const NEXT_SYNC_COMMITTEE_INDEX_LOG2: u64 = 5;
 	pub const ELECTRA_FORK_VERSION: Version = hex_literal::hex!("05000000");
 	pub const ELECTRA_FORK_EPOCH: Epoch = 364032;
-	pub const FORKS: [(Epoch, Version); 5] = [
-	(ALTAIR_FORK_EPOCH, ALTAIR_FORK_VERSION),
-	(BELLATRIX_FORK_EPOCH, BELLATRIX_FORK_VERSION),
-	(CAPELLA_FORK_EPOCH, CAPELLA_FORK_VERSION),
-	(DENEB_FORK_EPOCH, DENEB_FORK_VERSION),
-	(ELECTRA_FORK_EPOCH, ELECTRA_FORK_VERSION)
-];
 }
 
 #[cfg(feature = "sepolia")]
@@ -177,13 +170,6 @@ pub mod sepolia {
 	pub const NEXT_SYNC_COMMITTEE_INDEX_LOG2: u64 = 6;
 	pub const ELECTRA_FORK_VERSION: Version = hex_literal::hex!("90000074");
 	pub const ELECTRA_FORK_EPOCH: Epoch = 222464;
-	pub const FORKS: [(Epoch, Version); 5] = [
-	(ALTAIR_FORK_EPOCH, ALTAIR_FORK_VERSION),
-	(BELLATRIX_FORK_EPOCH, BELLATRIX_FORK_VERSION),
-	(CAPELLA_FORK_EPOCH, CAPELLA_FORK_VERSION),
-	(DENEB_FORK_EPOCH, DENEB_FORK_VERSION),
-	(ELECTRA_FORK_EPOCH, ELECTRA_FORK_VERSION)
-];
 }
 
 #[cfg(all(not(feature = "mainnet"), not(feature = "goerli"), not(feature = "sepolia")))]
@@ -214,11 +200,12 @@ pub mod devnet {
 	pub const NEXT_SYNC_COMMITTEE_INDEX_LOG2: u64 = 5;
 	pub const ELECTRA_FORK_VERSION: Version = hex_literal::hex!("52525505");
 	pub const ELECTRA_FORK_EPOCH: Epoch = Epoch::MAX;
-	pub const FORKS: [(Epoch, Version); 5] = [
+}
+
+pub const FORKS: [(Epoch, Version); 5] = [
 	(ALTAIR_FORK_EPOCH, ALTAIR_FORK_VERSION),
 	(BELLATRIX_FORK_EPOCH, BELLATRIX_FORK_VERSION),
 	(CAPELLA_FORK_EPOCH, CAPELLA_FORK_VERSION),
 	(DENEB_FORK_EPOCH, DENEB_FORK_VERSION),
 	(ELECTRA_FORK_EPOCH, ELECTRA_FORK_VERSION)
 ];
-}
