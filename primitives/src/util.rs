@@ -1,3 +1,4 @@
+#[cfg(feature = "goerli")]
 use crate::{
 	consensus_types::ForkData,
 	constants::{
@@ -9,6 +10,43 @@ use crate::{
 	},
 	domains::DomainType,
 };
+#[cfg(feature = "mainnet")]
+use crate::{
+	consensus_types::ForkData,
+	constants::{
+		Domain, Root, Slot, Version, ALTAIR_FORK_EPOCH, ALTAIR_FORK_VERSION, BELLATRIX_FORK_EPOCH,
+		BELLATRIX_FORK_VERSION, CAPELLA_FORK_EPOCH, CAPELLA_FORK_VERSION,
+		EPOCHS_PER_SYNC_COMMITTEE_PERIOD, GENESIS_FORK_VERSION, SLOTS_PER_EPOCH,
+		DENEB_FORK_EPOCH, DENEB_FORK_VERSION, 
+		ELECTRA_FORK_EPOCH, ELECTRA_FORK_VERSION
+	},
+	domains::DomainType,
+};
+#[cfg(feature = "sepolia")]
+use crate::{
+	consensus_types::ForkData,
+	constants::{
+		Domain, Root, Slot, Version, ALTAIR_FORK_EPOCH, ALTAIR_FORK_VERSION, BELLATRIX_FORK_EPOCH,
+		BELLATRIX_FORK_VERSION, CAPELLA_FORK_EPOCH, CAPELLA_FORK_VERSION,
+		EPOCHS_PER_SYNC_COMMITTEE_PERIOD, GENESIS_FORK_VERSION, SLOTS_PER_EPOCH,
+		DENEB_FORK_EPOCH, DENEB_FORK_VERSION, 
+		ELECTRA_FORK_EPOCH, ELECTRA_FORK_VERSION
+	},
+	domains::DomainType,
+};
+#[cfg(all(not(feature = "mainnet"), not(feature = "goerli"), not(feature = "sepolia")))]
+use crate::{
+	consensus_types::ForkData,
+	constants::{
+		Domain, Root, Slot, Version, ALTAIR_FORK_EPOCH, ALTAIR_FORK_VERSION, BELLATRIX_FORK_EPOCH,
+		BELLATRIX_FORK_VERSION, CAPELLA_FORK_EPOCH, CAPELLA_FORK_VERSION,
+		EPOCHS_PER_SYNC_COMMITTEE_PERIOD, GENESIS_FORK_VERSION, SLOTS_PER_EPOCH,
+		DENEB_FORK_EPOCH, DENEB_FORK_VERSION, 
+		ELECTRA_FORK_EPOCH, ELECTRA_FORK_VERSION
+	},
+	domains::DomainType,
+};
+
 use alloc::{vec, vec::Vec};
 use anyhow::anyhow;
 use ssz_rs::prelude::*;
