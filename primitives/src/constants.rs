@@ -121,12 +121,8 @@ pub mod mainnet {
 	pub const GENESIS_VALIDATORS_ROOT: [u8; 32] =
 			hex_literal::hex!("4b363db94e286120d76eb905340fdd4e54bfe9f06bf33ff6cf5ad27f511bfe95");
 	pub const BELLATRIX_FORK_VERSION: Version = hex_literal::hex!("02000000");
-	pub const BELLATRIX_FORK_VERSION: Version = hex_literal::hex!("02000000");
-	pub const ALTAIR_FORK_VERSION: Version = hex_literal::hex!("01000000");
 	pub const ALTAIR_FORK_VERSION: Version = hex_literal::hex!("01000000");
 	pub const GENESIS_FORK_VERSION: Version = hex_literal::hex!("00000000");
-	pub const GENESIS_FORK_VERSION: Version = hex_literal::hex!("00000000");
-	pub const ALTAIR_FORK_EPOCH: Epoch = 74240;
 	pub const ALTAIR_FORK_EPOCH: Epoch = 74240;
 	pub const BELLATRIX_FORK_EPOCH: Epoch = 144896;
 	pub const CAPELLA_FORK_EPOCH: Epoch = 194048;
@@ -144,7 +140,7 @@ pub mod mainnet {
 	pub const EXECUTION_PAYLOAD_INDEX_LOG2: u64 = EXECUTION_PAYLOAD_INDEX_LOG2;
 	pub const NEXT_SYNC_COMMITTEE_INDEX_LOG2: u64 = NEXT_SYNC_COMMITTEE_INDEX_LOG2;
 	pub const ELECTRA_FORK_VERSION: Version = hex_literal::hex!("05000000");
-	pub const ELECTRA_FORK_EPOCH: Epoch = Epoch::MAX;
+	pub const ELECTRA_FORK_EPOCH: Epoch = 364032;
 }
 
 #[cfg(feature = "sepolia")]
