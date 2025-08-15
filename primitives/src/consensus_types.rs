@@ -382,6 +382,7 @@ pub struct HistoricalSummary {
 #[derive(Default, Debug, SimpleSerialize, codec::Encode, codec::Decode, Clone, PartialEq, Eq)]
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct DepositRequest {
+	#[cfg_attr(feature = "serialize", serde(rename = "pubkey"))]
 	pub pub_key: BlsPublicKey,
 	pub withdrawal_credentials: Bytes32,
 	#[serde(with = "crate::serde::as_string")]
