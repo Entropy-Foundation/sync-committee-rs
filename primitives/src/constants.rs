@@ -82,6 +82,7 @@ pub const MAX_CONSOLIDATION_REQUESTS_PER_PAYLOAD: usize = 2usize.saturating_pow(
 pub const PENDING_DEPOSITS_LIMIT: usize = 2usize.saturating_pow(27);
 pub const PENDING_PARTIAL_WITHDRAWALS_LIMIT: usize = 2usize.saturating_pow(27);
 pub const PENDING_CONSOLIDATIONS_LIMIT: usize = 2usize.saturating_pow(18);
+pub const PROPOSER_LOOK_AHEAD_LIMIT: usize = 64;
 
 
 #[cfg(feature = "goerli")]
@@ -141,6 +142,8 @@ pub mod mainnet {
 	pub const NEXT_SYNC_COMMITTEE_INDEX_LOG2: u64 = 5;
 	pub const ELECTRA_FORK_VERSION: Version = hex_literal::hex!("05000000");
 	pub const ELECTRA_FORK_EPOCH: Epoch = 364032;
+	pub const FULU_FORK_EPOCH: Epoch = u64::MAX;
+	pub const FULU_FORK_VERSION: Version = hex_literal::hex!("06000000");
 }
 
 #[cfg(feature = "sepolia")]
@@ -170,6 +173,8 @@ pub mod sepolia {
 	pub const NEXT_SYNC_COMMITTEE_INDEX_LOG2: u64 = 6;
 	pub const ELECTRA_FORK_VERSION: Version = hex_literal::hex!("90000074");
 	pub const ELECTRA_FORK_EPOCH: Epoch = 222464;
+	pub const FULU_FORK_EPOCH: Epoch = 272640;
+	pub const FULU_FORK_VERSION: Version = hex_literal::hex!("90000075");
 }
 
 #[cfg(all(not(feature = "mainnet"), not(feature = "goerli"), not(feature = "sepolia")))]
@@ -199,13 +204,16 @@ pub mod devnet {
 	pub const EXECUTION_PAYLOAD_INDEX_LOG2: u64 = 5;
 	pub const NEXT_SYNC_COMMITTEE_INDEX_LOG2: u64 = 5;
 	pub const ELECTRA_FORK_VERSION: Version = hex_literal::hex!("52525505");
-	pub const ELECTRA_FORK_EPOCH: Epoch = Epoch::MAX;
+	pub const ELECTRA_FORK_EPOCH: Epoch = 0;
+	pub const FULU_FORK_EPOCH: Epoch = u64::MAX;
+	pub const FULU_FORK_VERSION: Version = hex_literal::hex!("52525506");
 }
 
-pub const FORKS: [(Epoch, Version); 5] = [
+pub const FORKS: [(Epoch, Version); 6] = [
 	(ALTAIR_FORK_EPOCH, ALTAIR_FORK_VERSION),
 	(BELLATRIX_FORK_EPOCH, BELLATRIX_FORK_VERSION),
 	(CAPELLA_FORK_EPOCH, CAPELLA_FORK_VERSION),
 	(DENEB_FORK_EPOCH, DENEB_FORK_VERSION),
-	(ELECTRA_FORK_EPOCH, ELECTRA_FORK_VERSION)
+	(ELECTRA_FORK_EPOCH, ELECTRA_FORK_VERSION),
+	(FULU_FORK_EPOCH, FULU_FORK_VERSION),	
 ];

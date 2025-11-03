@@ -476,6 +476,7 @@ pub struct BeaconState<
 	const PENDING_DEPOSITS_LIMIT: usize,
 	const PENDING_CONSOLIDATIONS_LIMIT: usize,
 	const PENDING_PARTIAL_WITHDRAWALS_LIMIT: usize,
+	const PROPOSER_LOOK_AHEAD_LIMIT: usize
 > {
 	#[serde(with = "crate::serde::as_string")]
 	pub genesis_time: u64,
@@ -533,5 +534,9 @@ pub struct BeaconState<
 	pending_deposits: List<PendingDeposit, PENDING_DEPOSITS_LIMIT>,
 	pending_partial_withdrawals: List<PendingPartialWithdrawal, PENDING_PARTIAL_WITHDRAWALS_LIMIT>,
 	pending_consolidations: List<PendingConsolidation, PENDING_CONSOLIDATIONS_LIMIT>,
-	// 
+	
+	// In Fulu
+	#[cfg_attr(feature = "serialize", serde(with = "crate::serde::collection_over_string"))]
+	pub proposer_lookahead: Vector<ValidatorIndex, PROPOSER_LOOK_AHEAD_LIMIT>
+
 }
