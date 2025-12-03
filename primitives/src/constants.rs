@@ -142,7 +142,7 @@ pub mod mainnet {
 	pub const NEXT_SYNC_COMMITTEE_INDEX_LOG2: u64 = 5;
 	pub const ELECTRA_FORK_VERSION: Version = hex_literal::hex!("05000000");
 	pub const ELECTRA_FORK_EPOCH: Epoch = 364032;
-	pub const FULU_FORK_EPOCH: Epoch = u64::MAX;
+	pub const FULU_FORK_EPOCH: Epoch = 411392;
 	pub const FULU_FORK_VERSION: Version = hex_literal::hex!("06000000");
 }
 
