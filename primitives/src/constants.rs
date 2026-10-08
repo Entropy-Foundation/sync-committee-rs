@@ -144,6 +144,8 @@ pub mod mainnet {
 	pub const ELECTRA_FORK_EPOCH: Epoch = 364032;
 	pub const FULU_FORK_EPOCH: Epoch = 411392;
 	pub const FULU_FORK_VERSION: Version = hex_literal::hex!("06000000");
+	pub const GLOAS_FORK_EPOCH: Epoch = u64::MAX;
+	pub const GLOAS_FORK_VERSION: Version = hex_literal::hex!("07000000");
 }
 
 #[cfg(feature = "sepolia")]
@@ -175,6 +177,8 @@ pub mod sepolia {
 	pub const ELECTRA_FORK_EPOCH: Epoch = 222464;
 	pub const FULU_FORK_EPOCH: Epoch = 272640;
 	pub const FULU_FORK_VERSION: Version = hex_literal::hex!("90000075");
+	pub const GLOAS_FORK_EPOCH: Epoch = 353024;
+	pub const GLOAS_FORK_VERSION: Version = hex_literal::hex!("90000076");
 }
 
 #[cfg(all(not(feature = "mainnet"), not(feature = "goerli"), not(feature = "sepolia")))]
@@ -207,13 +211,16 @@ pub mod devnet {
 	pub const ELECTRA_FORK_EPOCH: Epoch = 0;
 	pub const FULU_FORK_EPOCH: Epoch = u64::MAX;
 	pub const FULU_FORK_VERSION: Version = hex_literal::hex!("52525506");
+	pub const GLOAS_FORK_EPOCH: Epoch = u64::MAX;
+	pub const GLOAS_FORK_VERSION: Version = hex_literal::hex!("52525507");
 }
 
-pub const FORKS: [(Epoch, Version); 6] = [
+pub const FORKS: [(Epoch, Version); 7] = [
 	(ALTAIR_FORK_EPOCH, ALTAIR_FORK_VERSION),
 	(BELLATRIX_FORK_EPOCH, BELLATRIX_FORK_VERSION),
 	(CAPELLA_FORK_EPOCH, CAPELLA_FORK_VERSION),
 	(DENEB_FORK_EPOCH, DENEB_FORK_VERSION),
 	(ELECTRA_FORK_EPOCH, ELECTRA_FORK_VERSION),
-	(FULU_FORK_EPOCH, FULU_FORK_VERSION),	
+	(FULU_FORK_EPOCH, FULU_FORK_VERSION),
+	(GLOAS_FORK_EPOCH, GLOAS_FORK_VERSION),
 ];

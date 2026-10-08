@@ -6,7 +6,8 @@ use crate::{
 		EPOCHS_PER_SYNC_COMMITTEE_PERIOD, GENESIS_FORK_VERSION, SLOTS_PER_EPOCH,
 		DENEB_FORK_EPOCH, DENEB_FORK_VERSION, 
 		ELECTRA_FORK_EPOCH, ELECTRA_FORK_VERSION,
-		FULU_FORK_EPOCH, FULU_FORK_VERSION
+		FULU_FORK_EPOCH, FULU_FORK_VERSION,
+		GLOAS_FORK_EPOCH, GLOAS_FORK_VERSION
 	},
 	domains::DomainType,
 };
@@ -34,7 +35,9 @@ pub fn compute_epoch_at_slot(slot: u64) -> u64 {
 #[cfg(not(feature = "testing"))]
 /// Return the fork version at the given ``epoch``.
 pub fn compute_fork_version(epoch: u64) -> [u8; 4] {
-    if epoch >= FULU_FORK_EPOCH {
+    if epoch >= GLOAS_FORK_EPOCH {
+		GLOAS_FORK_VERSION
+	} else if epoch >= FULU_FORK_EPOCH {
 		FULU_FORK_VERSION
 	} else if epoch >= ELECTRA_FORK_EPOCH {
 		ELECTRA_FORK_VERSION
